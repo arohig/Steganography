@@ -10,6 +10,7 @@ void setup()
   println("The encoded image will be saved as \"Encoded Image.jpg\" and the decoded image as \"Decoded Image.jpg\"");
   println("You can also view the cover image by typing 'c' or the secret image by typing 's'.");
   
+  // Firstly, I saved two different images that have the same dimensions and loaded them into the program.
   cover = loadImage("Cover Image.jpg");
   secret = loadImage("Secret Image.jpg");
   
@@ -17,10 +18,12 @@ void setup()
   encodedImage = createImage(cover.width,cover.height, RGB);
   decodedImage = createImage(cover.width,cover.height, RGB);
   
+  // In a nested for-loop, I retrieved each pixel's RGB value from the cover image and from the secret image. I stored the values in two separate 2D arrays, coverPixel and secretPixel.
   int[][] coverPixel = new int[cover.width][cover.height];
   int[][] secretPixel = new int[secret.width][secret.height];
 
   // to encode
+  // I converted the secret image pixels into 0s or 1s so that I could use these numbers to hide the secret image inside the cover image. If the secret image pixel had a high Red value between 128 and 255, I made its value 1. If the secret image pixel had a low Red value, I made its value 0. I did the same for the Blue and Green values of each secret image's pixel.
   int curSecRedNum, curSecGreenNum, curSecBlueNum, curCovRedNum, curCovGreenNum, curCovBlueNum;
   encodedImage.loadPixels();
   for (int x = 0; x < cover.width; x++)
@@ -36,6 +39,8 @@ void setup()
       curCovGreenNum = (int) green(coverPixel[x][y]);
       curCovBlueNum = (int) blue(coverPixel[x][y]);
       int newNum;
+      
+      // To get a binary String form of the cover image pixel's Red value, I changed the number from base 10 to base 2 (binary) using Integer.toString(number, 2). I removed the last digit of this String. This number, now a 0 or 1, can be converted back to a String and then added to the binary form of the secret image pixel's Red value. Lastly, I converted the cover pixel's Red value back to base 10, which became the new Red value of the cover image. I did the same for the Blue and Green values of each cover image's pixel.
       if (curSecRedNum >= 128 && curSecRedNum <= 255)
       {
         curSecRedNum = 1;
@@ -75,11 +80,13 @@ void setup()
         curCovBlueNum = Integer.parseInt((Integer.toString(newNum) + curSecBlueNum), 2);
       }
       
+      // I created two files, encodedImage and decodedImage, and wrote the new encoded and decoded RGB information for the pixel into each file, respectively.
       encodedImage.pixels[x + (y*cover.width)] = color(curCovRedNum, curCovGreenNum, curCovBlueNum);
     } 
   }
   encodedImage.updatePixels();
   
+  // The secret image is encoded into the cover image and is essentially hidden. The decoded image will be seen as a result of reversing the process above.
   // to decode
   decodedImage.loadPixels();
   for (int x = 0; x < encodedImage.width; x++)
@@ -132,6 +139,9 @@ void setup()
   decodedImage.updatePixels();
 }
 
+// When the user presses the key c, he can view the cover image on the output screen of Processing.
+// When the user presses the key s, he can view the secret image on the output screen of Processing.
+// Pressing the key e shows the encoded image and pressing d shows the decoded image.
 void draw()
 {
   if (key == 'd')
